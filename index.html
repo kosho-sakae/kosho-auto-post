@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kosho Sakae Auto Post</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+  }
+  header {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+  header p { font-size: 1.1rem; color: #ccc; }
+  main { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+  section { background: #fff; border-radius: 8px; padding: 32px; margin-bottom: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; }
+  p { color: #555; margin-bottom: 12px; }
+  ul { list-style: none; padding: 0; }
+  ul li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #555; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: "✓ "; color: #4CAF50; font-weight: bold; }
+  .scope-tag {
+    display: inline-block; background: #eef2ff; color: #3949ab;
+    padding: 3px 10px; border-radius: 4px; font-size: 0.85rem;
+    margin: 4px 4px 4px 0; font-family: monospace;
+  }
+  .operator { background: #fff; border-radius: 8px; padding: 24px 32px;
+              box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .operator p { margin: 4px 0; }
+  .operator a { color: #3949ab; text-decoration: none; }
+  footer { text-align: center; padding: 24px; color: #999; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Kosho Sakae Auto Post</h1>
+  <p>Automated video content posting web application</p>
+</header>
+
+<main>
+
+  <section>
+    <h2>About This Service</h2>
+    <p>
+      Kosho Sakae Auto Post is a web-based application that automates video content
+      posting through external video publishing APIs and OAuth authentication.
+      It integrates with Make.com and Creatomate to automate the full workflow
+      from content creation to publishing.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key Features</h2>
+    <ul>
+      <li>Automated video publishing via OAuth-authorized accounts</li>
+      <li>AI-generated video content scheduling and posting</li>
+      <li>Integration with Make.com automation workflows</li>
+      <li>Integration with Creatomate for dynamic video creation</li>
+      <li>Secure OAuth 2.0 authentication flow</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>API Products &amp; Scopes Used</h2>
+    <p>This application uses the following API products and permission scopes:</p>
+    <p>
+      <span class="scope-tag">Login Kit</span>
+      <span class="scope-tag">Content Posting API</span>
+      <span class="scope-tag">user.info.basic</span>
+      <span class="scope-tag">video.publish</span>
+      <span class="scope-tag">video.upload</span>
+    </p>
+    <p style="margin-top:12px;">
+      <strong>Login Kit</strong> — OAuth 2.0 authentication for securely linking user accounts.<br>
+      <strong>Content Posting API</strong> — Automated posting of video content to authorized accounts.
+    </p>
+  </section>
+
+  <section>
+    <h2>How It Works</h2>
+    <p>
+      Users grant permission through a standard OAuth 2.0 flow. Once authorized,
+      the service operates strictly within the granted permission scope. Users can
+      revoke access at any time through the platform's settings page.
+    </p>
+    <p>
+      All operations are performed on behalf of the user only with their explicit consent.
+      No content is posted without prior authorization.
+    </p>
+  </section>
+
+  <section>
+    <h2>Legal</h2>
+    <ul>
+      <li><a href="https://dojo.1kosho.com/terms-of-service/" target="_blank">Terms of Service</a></li>
+      <li><a href="https://dojo.1kosho.com/privacy-policy/" target="_blank">Privacy Policy</a></li>
+    </ul>
+  </section>
+
+  <div class="operator">
+    <h2>Operator</h2>
+    <p><strong>Kosho Sakae</strong></p>
+    <p>Website: <a href="https://dojo.1kosho.com/">https://dojo.1kosho.com/</a></p>
+    <p>Email: <a href="mailto:sakaekojiro@gmail.com">sakaekojiro@gmail.com</a></p>
+  </div>
+
+</main>
+
+<footer>
+  &copy; 2026 Kosho Sakae Auto Post. All rights reserved.
+</footer>
+
+</body>
+</html>
