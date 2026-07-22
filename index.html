@@ -1,125 +1,898 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kosho Sakae Auto Post</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-  }
-  header {
-    background: #1a1a2e;
-    color: #fff;
-    padding: 48px 24px;
-    text-align: center;
-  }
-  header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
-  header p { font-size: 1.1rem; color: #ccc; }
-  main { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
-  section { background: #fff; border-radius: 8px; padding: 32px; margin-bottom: 24px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-  h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; }
-  p { color: #555; margin-bottom: 12px; }
-  ul { list-style: none; padding: 0; }
-  ul li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #555; }
-  ul li:last-child { border-bottom: none; }
-  ul li::before { content: "✓ "; color: #4CAF50; font-weight: bold; }
-  .scope-tag {
-    display: inline-block; background: #eef2ff; color: #3949ab;
-    padding: 3px 10px; border-radius: 4px; font-size: 0.85rem;
-    margin: 4px 4px 4px 0; font-family: monospace;
-  }
-  .operator { background: #fff; border-radius: 8px; padding: 24px 32px;
-              box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-  .operator p { margin: 4px 0; }
-  .operator a { color: #3949ab; text-decoration: none; }
-  footer { text-align: center; padding: 24px; color: #999; font-size: 0.85rem; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kosho Auto Post — TikTok Content Management</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #010101;
+      --accent: #fe2c55;
+      --accent2: #25f4ee;
+      --bg: #f8f9fa;
+      --sidebar-w: 240px;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --border: #e5e7eb;
+      --white: #ffffff;
+      --success: #22c55e;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+    /* ===== LAYOUT ===== */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--primary);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 18px; color: white;
+      flex-shrink: 0;
+    }
+    .logo-text { font-size: 14px; font-weight: 700; line-height: 1.3; }
+    .logo-sub { font-size: 10px; color: #777; }
+    .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+    .nav-section { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.8px; padding: 16px 20px 6px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 20px;
+      cursor: pointer;
+      color: #aaa;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+      font-size: 14px;
+      user-select: none;
+    }
+    .nav-item:hover { color: #ddd; background: #111; }
+    .nav-item.active { color: white; background: #1a1a1a; border-left-color: var(--accent); }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid #2a2a2a; }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .user-name { font-size: 13px; color: #ddd; font-weight: 600; }
+    .user-email { font-size: 11px; color: #777; }
+
+    /* ===== MAIN ===== */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+    .header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .header-title { font-size: 17px; font-weight: 700; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .badge-dot {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #f0fdf4; color: #166534;
+      font-size: 12px; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px;
+      border: 1px solid #bbf7d0;
+    }
+    .dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: all 0.15s;
+      text-decoration: none; color: inherit;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #e0183d; }
+    .btn-outline { background: white; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: #f5f5f5; }
+    .btn-dark { background: var(--primary); color: white; }
+    .btn-dark:hover { background: #222; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-lg { padding: 13px 24px; font-size: 15px; }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 28px 32px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ===== STATS ===== */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+    .stat-card {
+      background: white; border-radius: 10px;
+      padding: 22px 24px; border: 1px solid var(--border);
+    }
+    .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+    .stat-value { font-size: 30px; font-weight: 800; margin-bottom: 4px; }
+    .stat-sub { font-size: 12px; color: var(--success); }
+    .stat-sub.muted { color: var(--text-muted); }
+
+    /* ===== CARDS ===== */
+    .card { background: white; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 22px; overflow: hidden; }
+    .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 700; }
+    .card-body { padding: 24px; }
+
+    /* ===== TABLE ===== */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; background: #fafafa; border-bottom: 1px solid var(--border); }
+    td { padding: 13px 16px; border-bottom: 1px solid #f0f0f0; font-size: 13px; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+    .video-title { font-weight: 600; font-size: 13px; }
+    .video-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ===== STATUS ===== */
+    .pill {
+      display: inline-block; padding: 3px 9px;
+      border-radius: 20px; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .pill-green { background: #dcfce7; color: #166534; }
+    .pill-yellow { background: #fef9c3; color: #854d0e; }
+    .pill-gray { background: #f1f5f9; color: #475569; }
+    .pill-blue { background: #eff6ff; color: #1d4ed8; }
+
+    /* ===== CONNECT PAGE ===== */
+    .connect-wrap { max-width: 560px; margin: 0 auto; padding: 40px 0; }
+    .connect-icon-wrap {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border-radius: 18px;
+      margin: 0 auto 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .connect-wrap h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; text-align: center; }
+    .connect-wrap .lead { text-align: center; color: var(--text-muted); margin-bottom: 32px; font-size: 14px; }
+    .steps-box { background: #fafafa; border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 24px; }
+    .steps-box h3 { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 18px; font-weight: 700; }
+    .step { display: flex; gap: 14px; margin-bottom: 14px; }
+    .step:last-child { margin-bottom: 0; }
+    .step-num { width: 26px; height: 26px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+    .step-text { font-size: 13px; padding-top: 4px; }
+    .scope-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .scope-chip { background: #eef2ff; color: #3730a3; font-size: 11px; padding: 4px 9px; border-radius: 4px; font-family: monospace; font-weight: 600; }
+    .oauth-btn-wrap { text-align: center; }
+    .tiktok-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      background: #010101; color: white;
+      padding: 16px 40px; border-radius: 8px; border: none;
+      font-size: 15px; font-weight: 700; cursor: pointer; width: 100%;
+      transition: background 0.2s;
+    }
+    .tiktok-btn:hover { background: #333; }
+    .oauth-note { font-size: 11px; color: #999; text-align: center; margin-top: 12px; }
+
+    /* ===== LANDING PAGE ===== */
+    #landingView { background: white; }
+    .lp-nav {
+      background: var(--primary); padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; position: sticky; top: 0; z-index: 200;
+    }
+    .lp-logo { color: white; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .lp-logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent2), var(--accent)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: white; }
+    .lp-nav-links { display: flex; align-items: center; gap: 8px; }
+    .lp-nav-links a { color: #aaa; text-decoration: none; font-size: 13px; padding: 6px 14px; border-radius: 6px; transition: color 0.2s; }
+    .lp-nav-links a:hover { color: white; }
+
+    .hero { background: linear-gradient(135deg, #050505 0%, #1a0a0a 100%); color: white; padding: 90px 40px; text-align: center; }
+    .hero h1 { font-size: 52px; font-weight: 900; margin-bottom: 20px; line-height: 1.1; letter-spacing: -1px; }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero p { font-size: 18px; color: #bbb; max-width: 580px; margin: 0 auto 44px; }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; }
+
+    .section { padding: 80px 40px; }
+    .section-inner { max-width: 1080px; margin: 0 auto; }
+    .section-title { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 48px; letter-spacing: -0.5px; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feat {
+      background: white; border-radius: 12px; padding: 28px;
+      border: 1px solid var(--border); transition: box-shadow 0.2s;
+    }
+    .feat:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .feat-icon { font-size: 28px; margin-bottom: 14px; }
+    .feat h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+    .feat p { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+    .how-section { background: #f8f9fa; }
+    .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
+    .flow-step { text-align: center; padding: 20px; }
+    .flow-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px; }
+    .flow-label { font-size: 12px; font-weight: 700; color: var(--text); }
+    .flow-sub { font-size: 11px; color: var(--text-muted); }
+    .flow-arrow { font-size: 20px; color: #d1d5db; padding-bottom: 24px; }
+
+    .scopes-section { background: var(--primary); color: white; }
+    .scopes-section .section-title { color: white; }
+    .scopes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .scope-item { background: #1a1a1a; border-radius: 10px; padding: 20px; border: 1px solid #333; }
+    .scope-item h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--accent2); font-family: monospace; }
+    .scope-item p { font-size: 12px; color: #999; }
+
+    .cta-section { background: var(--accent); color: white; text-align: center; padding: 80px 40px; }
+    .cta-section h2 { font-size: 36px; font-weight: 900; margin-bottom: 14px; }
+    .cta-section p { font-size: 16px; opacity: 0.85; margin-bottom: 36px; }
+    .btn-white { background: white; color: var(--accent); }
+    .btn-white:hover { background: #f0f0f0; }
+
+    .lp-footer { background: #050505; color: #777; text-align: center; padding: 32px 40px; font-size: 12px; }
+    .lp-footer a { color: #999; text-decoration: none; }
+    .lp-footer a:hover { color: white; }
+
+    /* ===== MODAL ===== */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: center; justify-content: center; }
+    .overlay.open { display: flex; }
+    .modal { background: white; border-radius: 12px; padding: 40px 36px; max-width: 400px; width: 90%; text-align: center; }
+    .modal-icon { font-size: 44px; margin-bottom: 16px; }
+    .modal h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.7; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; }
+
+    /* ===== TOAST ===== */
+    .toast { position: fixed; bottom: 28px; right: 28px; background: #111; color: white; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ===== SETTINGS ===== */
+    .setting-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .setting-label { font-size: 13px; font-weight: 600; }
+    .setting-input { padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; max-width: 360px; outline: none; }
+    .setting-input:focus { border-color: var(--accent); }
+
+    /* ===== API STATUS ===== */
+    .status-row { display: flex; flex-wrap: wrap; gap: 32px; }
+    .status-item-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .status-indicator { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+    .dot-green { width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid, .scopes-grid { grid-template-columns: 1fr 1fr; }
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+    }
+    @media (max-width: 600px) {
+      .features-grid, .scopes-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 32px; }
+      .section { padding: 60px 20px; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>Kosho Sakae Auto Post</h1>
-  <p>Automated video content posting web application</p>
-</header>
+<!-- ====== APP (Dashboard UI) ====== -->
+<div class="app" id="appView" style="display:none">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">K</div>
+      <div>
+        <div class="logo-text">Kosho Auto Post</div>
+        <div class="logo-sub">TikTok Content Management</div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" data-page="dashboard" onclick="nav(this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" data-page="posts" onclick="nav(this)">
+        <span class="nav-icon">🎬</span> Posts
+      </div>
+      <div class="nav-item" data-page="schedule" onclick="nav(this)">
+        <span class="nav-icon">📅</span> Schedule
+      </div>
+      <div class="nav-section">Account</div>
+      <div class="nav-item" data-page="connect" onclick="nav(this)">
+        <span class="nav-icon">🔗</span> Connect Account
+      </div>
+      <div class="nav-item" data-page="settings" onclick="nav(this)">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+      <div class="nav-section">Help</div>
+      <div class="nav-item" onclick="showToast('Documentation coming soon.')">
+        <span class="nav-icon">📖</span> API Docs
+      </div>
+      <div class="nav-item" onclick="signOut()">
+        <span class="nav-icon">🚪</span> Sign Out
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">K</div>
+        <div>
+          <div class="user-name">Kosho Sakae</div>
+          <div class="user-email">sakaekojiro@gmail.com</div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-<main>
+  <div class="main">
 
-  <section>
-    <h2>About This Service</h2>
-    <p>
-      Kosho Sakae Auto Post is a web-based application that automates video content
-      posting through external video publishing APIs and OAuth authentication.
-      It integrates with Make.com and Creatomate to automate the full workflow
-      from content creation to publishing.
-    </p>
-  </section>
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="header">
+        <div class="header-title">Dashboard</div>
+        <div class="header-actions">
+          <div class="badge-dot"><span class="dot"></span> TikTok Connected</div>
+          <button class="btn btn-primary" onclick="openModal('newpost')">+ New Post</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Published</div>
+            <div class="stat-value">47</div>
+            <div class="stat-sub">&#8593; 8 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Scheduled</div>
+            <div class="stat-value">3</div>
+            <div class="stat-sub muted">Next: 2026-07-23 06:00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Views</div>
+            <div class="stat-value">12.4K</div>
+            <div class="stat-sub">&#8593; 23% this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Connected Accounts</div>
+            <div class="stat-value">1</div>
+            <div class="stat-sub muted">@kosho_dojo</div>
+          </div>
+        </div>
 
-  <section>
-    <h2>Key Features</h2>
-    <ul>
-      <li>Automated video publishing via OAuth-authorized accounts</li>
-      <li>AI-generated video content scheduling and posting</li>
-      <li>Integration with Make.com automation workflows</li>
-      <li>Integration with Creatomate for dynamic video creation</li>
-      <li>Secure OAuth 2.0 authentication flow</li>
-    </ul>
-  </section>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Posts</div>
+            <button class="btn btn-outline btn-sm" onclick="navById('posts')">View All</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Video</th>
+                <th>Account</th>
+                <th>Date</th>
+                <th>Views</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="video-title">&#24460;&#24858;&#12398;&#12394;&#12356;&#20154;&#29983; #47</div><div class="video-meta">Auto-generated via Make.com</div></td>
+                <td>@kosho_dojo</td>
+                <td>2026-07-22 09:00</td>
+                <td>843</td>
+                <td><span class="pill pill-green">Published</span></td>
+              </tr>
+              <tr>
+                <td><div class="video-title">&#39746;&#12398;&#26178; &#8212; &#20170;&#26085;&#12398;&#35328;&#38728;</div><div class="video-meta">Auto-generated via Make.com</div></td>
+                <td>@kosho_dojo</td>
+                <td>2026-07-21 12:00</td>
+                <td>1,247</td>
+                <td><span class="pill pill-green">Published</span></td>
+              </tr>
+              <tr>
+                <td><div class="video-title">&#39746;&#12398;&#26178; &#8212; &#20170;&#26085;&#12398;&#35328;&#38728;</div><div class="video-meta">Auto-generated via Make.com</div></td>
+                <td>@kosho_dojo</td>
+                <td>2026-07-23 06:00</td>
+                <td>&#8212;</td>
+                <td><span class="pill pill-yellow">Scheduled</span></td>
+              </tr>
+              <tr>
+                <td><div class="video-title">&#26478;&#26085;&#37096;&#12363;&#12425;&#12398;&#27671;&#12389;&#12365;</div><div class="video-meta">Draft saved</div></td>
+                <td>@kosho_dojo</td>
+                <td>&#8212;</td>
+                <td>&#8212;</td>
+                <td><span class="pill pill-gray">Draft</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-  <section>
-    <h2>API Products &amp; Scopes Used</h2>
-    <p>This application uses the following API products and permission scopes:</p>
-    <p>
-      <span class="scope-tag">Login Kit</span>
-      <span class="scope-tag">Content Posting API</span>
-      <span class="scope-tag">user.info.basic</span>
-      <span class="scope-tag">video.publish</span>
-      <span class="scope-tag">video.upload</span>
-    </p>
-    <p style="margin-top:12px;">
-      <strong>Login Kit</strong> — OAuth 2.0 authentication for securely linking user accounts.<br>
-      <strong>Content Posting API</strong> — Automated posting of video content to authorized accounts.
-    </p>
-  </section>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">API &amp; Integration Status</div>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Status refreshed.')">Refresh</button>
+          </div>
+          <div class="card-body">
+            <div class="status-row">
+              <div>
+                <div class="status-item-label">TikTok Account</div>
+                <div class="status-indicator"><span class="dot-green"></span> @kosho_dojo</div>
+              </div>
+              <div>
+                <div class="status-item-label">OAuth Scopes</div>
+                <div class="scope-chips" style="margin-top:4px">
+                  <span class="scope-chip">user.info.basic</span>
+                  <span class="scope-chip">video.publish</span>
+                  <span class="scope-chip">video.upload</span>
+                </div>
+              </div>
+              <div>
+                <div class="status-item-label">Make.com Automation</div>
+                <div class="status-indicator"><span class="dot-green"></span> Active</div>
+              </div>
+              <div>
+                <div class="status-item-label">Creatomate</div>
+                <div class="status-indicator"><span class="dot-green"></span> Connected</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <section>
-    <h2>How It Works</h2>
-    <p>
-      Users grant permission through a standard OAuth 2.0 flow. Once authorized,
-      the service operates strictly within the granted permission scope. Users can
-      revoke access at any time through the platform's settings page.
-    </p>
-    <p>
-      All operations are performed on behalf of the user only with their explicit consent.
-      No content is posted without prior authorization.
-    </p>
-  </section>
+    <!-- POSTS -->
+    <div class="page" id="page-posts">
+      <div class="header">
+        <div class="header-title">Posts</div>
+        <div class="header-actions">
+          <select class="btn btn-outline" style="padding:8px 12px;font-size:13px">
+            <option>All Status</option>
+            <option>Published</option>
+            <option>Scheduled</option>
+            <option>Draft</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('newpost')">+ New Post</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">All Posts (47 total)</div>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Video</th><th>Account</th><th>Published / Scheduled</th><th>Views</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="video-title">&#24460;&#24858;&#12398;&#12394;&#12356;&#20154;&#29983; #47</div><div class="video-meta">1080x1920 &middot; 60s</div></td>
+                <td>@kosho_dojo</td><td>2026-07-22 09:00</td><td>843</td>
+                <td><span class="pill pill-green">Published</span></td>
+                <td><button class="btn btn-outline btn-sm">View</button></td>
+              </tr>
+              <tr>
+                <td><div class="video-title">&#39746;&#12398;&#26178; &#8212; &#20170;&#26085;&#12398;&#35328;&#38728;</div><div class="video-meta">1080x1920 &middot; 62s</div></td>
+                <td>@kosho_dojo</td><td>2026-07-23 06:00</td><td>&#8212;</td>
+                <td><span class="pill pill-yellow">Scheduled</span></td>
+                <td><button class="btn btn-outline btn-sm">Edit</button></td>
+              </tr>
+              <tr>
+                <td><div class="video-title">&#26478;&#26085;&#37096;&#12363;&#12425;&#12398;&#27671;&#12389;&#12365;</div><div class="video-meta">Draft</div></td>
+                <td>@kosho_dojo</td><td>&#8212;</td><td>&#8212;</td>
+                <td><span class="pill pill-gray">Draft</span></td>
+                <td><button class="btn btn-outline btn-sm">Edit</button></td>
+              </tr>
+              <tr>
+                <td><div class="video-title">&#24460;&#24858;&#12398;&#12394;&#12356;&#20154;&#29983; #46</div><div class="video-meta">1080x1920 &middot; 61s</div></td>
+                <td>@kosho_dojo</td><td>2026-07-20 09:00</td><td>2,104</td>
+                <td><span class="pill pill-green">Published</span></td>
+                <td><button class="btn btn-outline btn-sm">View</button></td>
+              </tr>
+              <tr>
+                <td><div class="video-title">&#24460;&#24858;&#12398;&#12394;&#12356;&#20154;&#29983; #45</div><div class="video-meta">1080x1920 &middot; 59s</div></td>
+                <td>@kosho_dojo</td><td>2026-07-19 09:00</td><td>978</td>
+                <td><span class="pill pill-green">Published</span></td>
+                <td><button class="btn btn-outline btn-sm">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-  <section>
-    <h2>Legal</h2>
-    <ul>
-      <li><a href="https://dojo.1kosho.com/terms-of-service/" target="_blank">Terms of Service</a></li>
-      <li><a href="https://dojo.1kosho.com/privacy-policy/" target="_blank">Privacy Policy</a></li>
-    </ul>
-  </section>
+    <!-- SCHEDULE -->
+    <div class="page" id="page-schedule">
+      <div class="header">
+        <div class="header-title">Schedule</div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openModal('newpost')">+ Schedule Post</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Upcoming Posts</div>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Date &amp; Time (JST)</th><th>Title</th><th>Account</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-07-23 06:00</td>
+                <td>&#39746;&#12398;&#26178; &#8212; &#20170;&#26085;&#12398;&#35328;&#38728;</td>
+                <td>@kosho_dojo</td>
+                <td><span class="pill pill-yellow">Scheduled</span></td>
+                <td><button class="btn btn-outline btn-sm">Edit</button></td>
+              </tr>
+              <tr>
+                <td>2026-07-24 06:00</td>
+                <td>&#23494;&#25375;&#12398;&#25르;&#12360; #48</td>
+                <td>@kosho_dojo</td>
+                <td><span class="pill pill-blue">Queued</span></td>
+                <td><button class="btn btn-outline btn-sm">Edit</button></td>
+              </tr>
+              <tr>
+                <td>2026-07-25 06:00</td>
+                <td>&#24460;&#24858;&#12398;&#12394;&#12356;&#19968;&#26085;</td>
+                <td>@kosho_dojo</td>
+                <td><span class="pill pill-blue">Queued</span></td>
+                <td><button class="btn btn-outline btn-sm">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Automation Workflow</div></div>
+          <div class="card-body">
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Posts are created and scheduled automatically via Make.com + Creatomate. The workflow runs daily and queues the next video.</div>
+            <div class="status-row">
+              <div><div class="status-item-label">Workflow</div><div class="status-indicator"><span class="dot-green"></span> Running (daily at 05:45 JST)</div></div>
+              <div><div class="status-item-label">Last Run</div><div class="status-indicator">2026-07-22 05:46 JST</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="operator">
-    <h2>Operator</h2>
-    <p><strong>Kosho Sakae</strong></p>
-    <p>Website: <a href="https://dojo.1kosho.com/">https://dojo.1kosho.com/</a></p>
-    <p>Email: <a href="mailto:sakaekojiro@gmail.com">sakaekojiro@gmail.com</a></p>
+    <!-- CONNECT -->
+    <div class="page" id="page-connect">
+      <div class="header">
+        <div class="header-title">Connect Account</div>
+      </div>
+      <div class="content">
+        <div class="connect-wrap">
+          <div class="connect-icon-wrap">&#9654;</div>
+          <h2>Connect Your TikTok Account</h2>
+          <p class="lead">Authorize Kosho Auto Post to publish videos on your behalf via TikTok's official Content Posting API using secure OAuth 2.0.</p>
+
+          <div class="steps-box">
+            <h3>Authorization Steps</h3>
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text">Click <strong>Connect with TikTok</strong> to open TikTok's official authorization page.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text">Sign in to TikTok (if not already) and review the requested permissions.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text">Approve the scopes. You'll be redirected back with your account linked.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text">The Make.com workflow activates automatically and begins posting on schedule.</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:24px">
+            <div class="card-header"><div class="card-title">Permissions Requested</div></div>
+            <div class="card-body">
+              <div class="scope-chips">
+                <span class="scope-chip">user.info.basic</span>
+                <span class="scope-chip">video.publish</span>
+                <span class="scope-chip">video.upload</span>
+              </div>
+              <div style="font-size:12px;color:#999;margin-top:14px;line-height:1.7">
+                Only these three scopes are requested. No access to DMs, followers, or payment information. Access can be revoked anytime from TikTok Settings &rarr; Privacy &rarr; Manage app permissions.
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:24px;background:#f0fdf4;border-color:#bbf7d0">
+            <div class="card-body" style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:20px">&#10003;</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#166534">@kosho_dojo is currently connected</div>
+                <div style="font-size:12px;color:#4b7c56;margin-top:2px">OAuth token active &middot; Last used 2026-07-22 09:00 JST</div>
+              </div>
+              <button class="btn btn-outline btn-sm" style="margin-left:auto;color:#dc2626;border-color:#fca5a5" onclick="openModal('disconnect')">Revoke</button>
+            </div>
+          </div>
+
+          <div class="oauth-btn-wrap">
+            <button class="tiktok-btn" onclick="startOAuth()">
+              &#9654; Connect with TikTok
+            </button>
+          </div>
+          <div class="oauth-note">Secured by TikTok's official OAuth 2.0 &mdash; your TikTok password is never shared with this application.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="header"><div class="header-title">Settings</div></div>
+      <div class="content">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Account</div></div>
+          <div class="card-body">
+            <div class="setting-row">
+              <div class="setting-label">Display Name</div>
+              <input type="text" class="setting-input" value="Kosho Sakae">
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Email Address</div>
+              <input type="email" class="setting-input" value="sakaekojiro@gmail.com">
+            </div>
+            <button class="btn btn-primary" onclick="showToast('Settings saved.')">Save Changes</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Connected TikTok Account</div></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:42px;height:42px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px">K</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px">@kosho_dojo</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Connected via TikTok OAuth 2.0</div>
+                </div>
+              </div>
+              <button class="btn btn-outline btn-sm" style="color:#dc2626;border-color:#fca5a5" onclick="openModal('disconnect')">Revoke Access</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Legal &amp; Compliance</div></div>
+          <div class="card-body" style="display:flex;gap:12px">
+            <a href="https://dojo.1kosho.com/privacy-policy/" target="_blank" class="btn btn-outline">Privacy Policy</a>
+            <a href="https://dojo.1kosho.com/terms-of-service/" target="_blank" class="btn btn-outline">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
+</div>
 
-</main>
 
-<footer>
-  &copy; 2026 Kosho Sakae Auto Post. All rights reserved.
-</footer>
+<!-- ====== LANDING PAGE ====== -->
+<div id="landingView">
+  <nav class="lp-nav">
+    <div class="lp-logo">
+      <div class="lp-logo-icon">K</div>
+      Kosho Auto Post
+    </div>
+    <div class="lp-nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+      <a href="#api">API Scopes</a>
+      <a href="#legal">Legal</a>
+      <button class="btn btn-primary" onclick="launchApp()">Launch App &rarr;</button>
+    </div>
+  </nav>
 
+  <section class="hero">
+    <h1>Automate Your TikTok<br><em>Content Publishing</em></h1>
+    <p>Connect your TikTok account via official OAuth 2.0 and publish videos automatically through Make.com workflows &mdash; scheduled, secure, and hands-free.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary btn-lg" onclick="launchApp()">Open Dashboard</button>
+      <a href="#how" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.3)">See How It Works</a>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="section-inner">
+      <div class="section-title">What Kosho Auto Post Does</div>
+      <div class="features-grid">
+        <div class="feat">
+          <div class="feat-icon">&#128272;</div>
+          <h3>Secure OAuth 2.0</h3>
+          <p>Uses TikTok's official authorization flow. Your credentials are never stored &mdash; only a scoped access token that can be revoked at any time.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">&#9889;</div>
+          <h3>Automated Publishing</h3>
+          <p>Videos publish automatically on schedule via Make.com. No manual uploads &mdash; the workflow handles everything from creation to posting.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">&#128202;</div>
+          <h3>Content Dashboard</h3>
+          <p>Track every published, scheduled, and draft post from a single dashboard. Monitor view counts and manage your entire content calendar.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">&#127910;</div>
+          <h3>AI Video Creation</h3>
+          <p>Integrates with Creatomate to generate dynamic AI-powered videos. From concept to published TikTok &mdash; fully automated.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">&#128197;</div>
+          <h3>Advanced Scheduling</h3>
+          <p>Queue posts days in advance. The system handles timing automatically, publishing at optimal hours even while you're offline.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">&#128274;</div>
+          <h3>Revocable Access</h3>
+          <p>Users can revoke authorization at any time from TikTok Settings. No data is retained after disconnection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section how-section" id="how">
+    <div class="section-inner">
+      <div class="section-title">How It Works</div>
+      <div class="flow-row">
+        <div class="flow-step">
+          <div class="flow-icon" style="background:#eef2ff">&#128279;</div>
+          <div class="flow-label">Connect TikTok</div>
+          <div class="flow-sub">OAuth 2.0</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="flow-icon" style="background:#fef9c3">&#9889;</div>
+          <div class="flow-label">Make.com</div>
+          <div class="flow-sub">Workflow triggers</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="flow-icon" style="background:#f0fdf4">&#127910;</div>
+          <div class="flow-label">Creatomate</div>
+          <div class="flow-sub">Renders video</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="flow-icon" style="background:#fff1f2">&#9654;</div>
+          <div class="flow-label">TikTok API</div>
+          <div class="flow-sub">Publishes video</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="flow-icon" style="background:#f0fdf4">&#10003;</div>
+          <div class="flow-label">Post Live</div>
+          <div class="flow-sub">Dashboard updated</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section scopes-section" id="api">
+    <div class="section-inner">
+      <div class="section-title">API Products &amp; Permission Scopes</div>
+      <div class="scopes-grid">
+        <div class="scope-item">
+          <h4>user.info.basic</h4>
+          <p>Reads the authenticated user's display name and avatar to show in the dashboard. No private data accessed.</p>
+        </div>
+        <div class="scope-item">
+          <h4>video.upload</h4>
+          <p>Uploads video files to TikTok's servers in preparation for publishing. Used as the first step of the posting workflow.</p>
+        </div>
+        <div class="scope-item">
+          <h4>video.publish</h4>
+          <p>Publishes uploaded videos to TikTok. Only triggered by the automated workflow with user-approved content.</p>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:32px;font-size:13px;color:#666">
+        API Products: <strong style="color:#ccc">Login Kit</strong> &nbsp;&middot;&nbsp; <strong style="color:#ccc">Content Posting API</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Ready to Automate?</h2>
+    <p>Connect your TikTok account and let the workflow do the work.</p>
+    <button class="btn btn-white btn-lg" onclick="launchApp()">Open the Dashboard &rarr;</button>
+  </section>
+
+  <footer class="lp-footer" id="legal">
+    <div style="margin-bottom:12px;display:flex;gap:24px;justify-content:center">
+      <a href="https://dojo.1kosho.com/privacy-policy/" target="_blank">Privacy Policy</a>
+      <a href="https://dojo.1kosho.com/terms-of-service/" target="_blank">Terms of Service</a>
+      <a href="mailto:sakaekojiro@gmail.com">Contact</a>
+    </div>
+    <div>Operator: <strong style="color:#ccc">Kosho Sakae</strong> &nbsp;&middot;&nbsp; <a href="https://dojo.1kosho.com/" target="_blank">dojo.1kosho.com</a> &nbsp;&middot;&nbsp; sakaekojiro@gmail.com</div>
+    <div style="margin-top:10px;color:#444">&copy; 2026 Kosho Auto Post. All rights reserved.</div>
+  </footer>
+</div>
+
+
+<!-- ====== MODALS ====== -->
+<div class="overlay" id="overlay-newpost" onclick="closeOverlay(event)">
+  <div class="modal">
+    <div class="modal-icon">&#127910;</div>
+    <h3>Trigger New Post</h3>
+    <p>New videos are created and published automatically via the Make.com workflow. Click below to trigger a new video creation and publishing sequence for <strong>@kosho_dojo</strong>.</p>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeOverlay()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeOverlay();showToast('Workflow triggered — video will be posted shortly.')">Trigger Workflow</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-disconnect" onclick="closeOverlay(event)">
+  <div class="modal">
+    <div class="modal-icon">&#9888;</div>
+    <h3>Revoke TikTok Access</h3>
+    <p>This will disconnect <strong>@kosho_dojo</strong> and stop all scheduled posts. You can reconnect at any time from the Connect Account page.</p>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeOverlay()">Cancel</button>
+      <button class="btn btn-primary" style="background:#dc2626" onclick="closeOverlay();showToast('Account disconnected.')">Revoke Access</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function nav(el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + el.dataset.page).classList.add('active');
+    el.classList.add('active');
+  }
+  function navById(id) {
+    const el = document.querySelector('[data-page="' + id + '"]');
+    if (el) nav(el);
+  }
+  function launchApp() {
+    document.getElementById('landingView').style.display = 'none';
+    document.getElementById('appView').style.display = 'flex';
+    window.scrollTo(0, 0);
+  }
+  function signOut() {
+    document.getElementById('appView').style.display = 'none';
+    document.getElementById('landingView').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+  function startOAuth() {
+    showToast('Redirecting to TikTok authorization...');
+  }
+  function openModal(id) {
+    document.getElementById('overlay-' + id).classList.add('open');
+  }
+  function closeOverlay(e) {
+    if (!e || e.target.classList.contains('overlay')) {
+      document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
+    }
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
 </body>
 </html>
